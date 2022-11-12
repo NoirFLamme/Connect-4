@@ -18,16 +18,19 @@ class State:
         self.stateCarrier &= ~(7 << 6+9*colChosen)
         self.stateCarrier |= requiredBlock << 6+9*colChosen
         self.changeTurn()
+        print("Move Done")
+
 
     def getLastColBlock(self,col):
-        var = (self.stateCarrier & 7 << 6 + 9 * col)
-        return var >> 6 + 9 * col
+        return (self.stateCarrier & 7 << 6 + 9 * col) >> 6 + 9 * col
 
     def checkTurn(self):
         return self.stateCarrier >> 64
 
     def changeTurn(self):
         self.stateCarrier ^= (1 << 64)
+        print("It's Player", self.checkTurn()+1,"'s turn")
+
 
     def mapToState(self,board,turn):
         self.stateCarrier = 0
@@ -57,6 +60,15 @@ class State:
         for i in board:
             print('\t'.join(map(str, i)))
         print("It's Player", self.checkTurn()+1,"'s turn")
+
+    def evaluation(self):
+        #TODO
+        pass
+
+    def getHeuristic(self):
+        #TODO
+        pass
+
 
 board1 = [
         [1, 1, 1, 1, 0, 1, 2],
