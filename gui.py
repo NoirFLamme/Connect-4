@@ -2,6 +2,8 @@ import numpy as np
 import pygame
 import sys
 import math
+from playsound import playsound
+
 
 BLUE = (0,139,139)
 BLACK = (0, 0, 0)
@@ -150,6 +152,7 @@ while not game_over:
                     draw_board(board)
                     pygame.display.update()
             else:
+                playsound("SoundEffects/move.wav")
                 pygame.draw.rect(screen, BLACK, (0, 0, width, SQUARESIZE))
                 # print(event.pos)
                 # Ask for Player 1 Input
@@ -162,9 +165,10 @@ while not game_over:
                         drop_piece(board, row, col, 1)
 
                         if winning_move(board, 1):
-                            label = myfont.render("Player 1 wins!!", 1, RED)
+                            label = myfont.render("Player 1 Point!", 1, RED)
                             screen.blit(label, (40, 10))
-                            game_over = True
+                            playsound("SoundEffects/point.wav")
+
 
 
                 # # Ask for Player 2 Input
@@ -177,9 +181,9 @@ while not game_over:
                         drop_piece(board, row, col, 2)
 
                         if winning_move(board, 2):
-                            label = myfont.render("Player 2 wins!!", 1, YELLOW)
+                            label = myfont.render("Player 2 Point!", 1, YELLOW)
                             screen.blit(label, (40, 10))
-                            game_over = True
+                            playsound("SoundEffects/point.wav")
 
                 print_board(board)
                 draw_board(board)
