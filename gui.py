@@ -118,7 +118,6 @@ smallfont = pygame.font.SysFont('Corbel', 35)
 quit = smallfont.render('quit', True, (255,255,255))
 alphabeta = smallfont.render('alphabeta', True, (255,255,255))
 minmax = smallfont.render('minmax', True, (255,255,255))
-
 while not game_over:
 
     for event in pygame.event.get():
