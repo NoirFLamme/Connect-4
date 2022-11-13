@@ -64,9 +64,10 @@ class State:
         print("It's Player", self.checkTurn()+1,"'s turn")
 
     def get(self,i,j):
+        print("Getting: ",i,j)
         if i>5 or i<0 or j<0 or j>6:
             print("Index out of Bound. State.get(",i,",",j,") Failed.")
-            return
+            return None
         thres = self.getLastColBlock(j)
         i = 5-i
         if (i<thres):
@@ -80,6 +81,7 @@ class State:
         pass
 
     def evaluate(self, i, j):
+        res = 0
         print("Checking",i,j)
         player = self.checkTurn() + 1
         print("Turn:",player)
@@ -89,7 +91,7 @@ class State:
         for k in range(leftBound,rightBound+1):
             if self.get(i,k) == player and self.get(i,k+1) == player and self.get(i,k+2) == player and self.get(i,k+3) == player:
                 print("hort")
-                return 1
+                res += 1
 
         # Check vertical locations for win
         upperBound = max(0,i-3)
@@ -97,7 +99,7 @@ class State:
         for k in range(upperBound,lowerBound+1):
             if self.get(k,j) == player and self.get(k+1,j) == player and self.get(k+2,j) == player and self.get(k+3,j) == player:
                 print("vert")
-                return 1
+                res += 1
 
         # Check positively sloped diagonals
         topLeftNorm = min(i-upperBound,j-leftBound)
@@ -106,7 +108,7 @@ class State:
         for d in range(topLeftNorm-bottomRightNorm+1):
             if self.get(i-d,j-d) == player and self.get(i-d+1,j-d+1) == player and self.get(i-d+2,j-d+2) == player and self.get(i-d+3,j-d+3) == player:
                 print("posi")
-                return 1
+                res += 1
 
         # Check negatively sloped diagonals
         bottomLeftNorm = min(i-lowerBound+3,j-leftBound)
@@ -115,8 +117,8 @@ class State:
         for d in range(bottomLeftNorm-topRightNorm+1):
             if self.get(i+d,j-d) == player and self.get(i+d-1,j-d+1) == player and self.get(i+d-2,j-d+2) == player and self.get(i+d-3,j-d+3) == player:
                 print("nega")
-                return 1
-        return 0
+                res += 1
+        return res
 
 
 board1 = [
@@ -129,9 +131,9 @@ board1 = [
 ]
 board2 = [
         [0	,0	,0	,0	,0	,1	,1],
-        [0	,0	,0	,0	,0	,2	,2],
-        [0	,0	,0	,0	,2	,1	,1],
-        [0	,0	,0	,2	,1	,2	,2],
+        [0	,0	,0	,0	,1	,2	,2],
+        [0	,0	,0	,1	,2	,1	,1],
+        [0	,1	,0	,1	,1	,2	,2],
         [0	,1	,1	,2	,2	,1	,1],
         [1	,2	,2	,1	,1	,2	,2],
 ]
@@ -143,13 +145,11 @@ trues = 0
 #     for j in range (i):
 #         if myState.move(i-1):
 #             trues +=1
-if myState.move(2):
-    trues +=1
+
 # if myState.move(0):
 #     trues += 1
 # if myState.move(3):
 #     trues += 1
-if myState.move(2):
-    trues +=1
+trues += myState.move(2)
 print("Trues: ",trues)
 myState.showState()
