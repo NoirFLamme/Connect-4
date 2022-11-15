@@ -78,9 +78,8 @@ class State:
         return 0
 
 
-
     def getHeuristic(self):
-        def get_score(count):
+        def get_score(count, cost): 
             empty = count[0]
             player = count[1]
             computer = count[2]
@@ -89,31 +88,45 @@ class State:
                 return 0
 
             # pieces are either player's or computer's
-            multiplier = -1 if player > 0 else 1
+            playerSign = -1 if player > 0 else 1
             index = player-1 if player > 0 else computer-1
-            values = [1, 2, 5, 10]
-            return values[index] * multiplier
 
-        heuristic = 0
+            if count[index] == 4:
+                return 80
+
+            return ((22-cost) + count[0]) * playerSign
+
+
+        def get_cost(row, col):
+            if (self.get(row,col) != 0):
+                return 0
+            return row - self.getLastColBlock(col) + ROW_COUNT
 
         WINDOW_SIZE = 4
-        count = [0, 0, 0]  # [emptyCount, playerCount, AIcount]
+        heuristic = 0
+        # count = [emptyCount, playerCount, AIcount]
 
         # Check horizontal
         for row in range(ROW_COUNT):
-            # Create window of size 4
             count = [0, 0, 0]
+            cost = 0
+
+            # Create window of size 4
             for col in range(WINDOW_SIZE):
                 count[self.get(row,col)] += 1
-            heuristic += get_score(count)
+                cost += get_cost(row, col)
+            heuristic += get_score(count, cost)
 
             # Slide the window
             colEnd = WINDOW_SIZE
             while colEnd < COLUMN_COUNT:
                 count[self.get(row, colEnd-WINDOW_SIZE)] -= 1
                 count[self.get(row, colEnd)] += 1
+                cost -= get_cost(row, colEnd-WINDOW_SIZE)
+                cost += get_cost(row, colEnd)
                 colEnd += 1
-                heuristic += get_score(count)
+                heuristic += get_score(count, cost)
+
 
         # Check vertical
         for col in range(COLUMN_COUNT):
@@ -121,7 +134,7 @@ class State:
             # Create window of size 4
             for row in range(WINDOW_SIZE):
                 count[self.get(row, col)] += 1
-            heuristic += get_score(count)
+            heuristic += get_score(count, count[0])
 
             # Slide the window
             rowEnd = WINDOW_SIZE
@@ -129,64 +142,81 @@ class State:
                 count[self.get(rowEnd-WINDOW_SIZE, col)] -= 1
                 count[self.get(rowEnd, col)] += 1
                 rowEnd += 1
-                heuristic += get_score(count)
+                heuristic += get_score(count, count[0])
+                        
 
-        # # Check diagonal
-        #
-        # # Check top left to bottom right
-        # start_row = ROW_COUNT - WINDOW_SIZE
-        # end_col = COLUMN_COUNT - WINDOW_SIZE
-        # start_col = 0
-        #
-        # while start_col <= end_col:
-        #     row = start_row
-        #     col = start_col
-        #
-        #     # Create window
-        #     for i in range(WINDOW_SIZE):
-        #         count[self.get(row, col)] += 1
-        #         row += 1
-        #         col += 1
-        #     heuristic += get_score(count)
-        #
-        #     # slide window
-        #     while row < ROW_COUNT:
-        #         count[self.get(row-WINDOW_SIZE, col-WINDOW_SIZE)] -= 1
-        #         count[self.get(row, col)] += 1
-        #         row += 1
-        #         col += 1
-        #
-        #     if start_row == 0:
-        #         start_col += 1
-        #     else:
-        #         start_row -= 1
-        #
-        # # Check top right to bottom left
-        # start_col -= 1
-        # end_row = ROW_COUNT - WINDOW_SIZE
-        #
-        # while start_row <= end_row:
-        #     row = start_row
-        #     col = start_col
-        #
-        #     # Create window
-        #     for i in range(WINDOW_SIZE):
-        #         count[self.get(row, col)] += 1
-        #         row += 1
-        #         col -= 1
-        #     heuristic += get_score(count)
-        #
-        #     # slide window
-        #     while col >= 0:
-        #         count[self.get(row-WINDOW_SIZE, col+WINDOW_SIZE)] -= 1
-        #         count[self.get(row, col)] += 1
-        #         row += 1
-        #         col -= 1
-        #
-        #     if start_col == COLUMN_COUNT-1:
-        #         start_row += 1
-        #     else:
-        #         start_col += 1
+        # Check diagonal
+        
+        # Check top left to bottom right
+        start_row = ROW_COUNT - WINDOW_SIZE
+        end_col = COLUMN_COUNT - WINDOW_SIZE
+        start_col = 0
+        
+        while start_col <= end_col:
+            count = [0, 0, 0]
+            cost = 0
+
+            row = start_row
+            col = start_col
+        
+            # Create window
+            for i in range(WINDOW_SIZE):
+                count[self.get(row,col)] += 1
+                cost += get_cost(row,col)
+                row += 1
+                col += 1
+            heuristic += get_score(count, cost)
+        
+            # slide window
+            while row < ROW_COUNT:
+                count[self.get(row-WINDOW_SIZE, col-WINDOW_SIZE)] -= 1
+                count[self.get(row,col)] += 1
+                cost -= get_cost(row-WINDOW_SIZE, col-WINDOW_SIZE)
+                cost += get_cost(row, col)
+                heuristic += get_score(count, cost)
+
+                row += 1
+                col += 1
+        
+            if start_row == 0:
+                start_col += 1
+            else:
+                start_row -= 1
+        
+        # Check top right to bottom left
+        start_col -= 1
+        end_row = ROW_COUNT - WINDOW_SIZE
+        
+        while start_row <= end_row:
+            count = [0, 0, 0]
+            cost = 0
+
+            row = start_row
+            col = start_col
+        
+            # Create window
+            for i in range(WINDOW_SIZE):
+                count[self.get(row,col)] += 1
+                cost += get_cost(row,col)
+                row += 1
+                col -= 1
+            heuristic += get_score(count, cost)
+        
+            # slide window
+            while col >= 0:
+                count[self.get(row-WINDOW_SIZE, col+WINDOW_SIZE)] -= 1
+                count[self.get(row, col)] += 1
+                cost -= get_cost(row-WINDOW_SIZE, col+WINDOW_SIZE)
+                cost += get_cost(row, col)
+                heuristic += get_score(count, cost)
+
+                row += 1
+                col -= 1
+        
+            if start_col == COLUMN_COUNT-1:
+                start_row += 1
+            else:
+                start_col += 1
 
         return heuristic
 
