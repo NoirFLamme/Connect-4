@@ -89,18 +89,20 @@ class State:
 
             # pieces are either player's or computer's
             playerSign = -1 if player > 0 else 1
-            index = player-1 if player > 0 else computer-1
+            index = 1 if player > 0 else 2
 
             if count[index] == 4:
-                return 80
+                return 100 * playerSign
 
-            return ((22-cost) + count[0]) * playerSign
+            x = (22 - (cost + count[0]) + 2**count[index]) * playerSign
+            print("current sliding window added: ",x)
+            return x
 
 
         def get_cost(row, col):
             if (self.get(row,col) != 0):
                 return 0
-            return row - self.getLastColBlock(col) + ROW_COUNT
+            return ROW_COUNT - row - self.getLastColBlock(col)
 
         WINDOW_SIZE = 4
         heuristic = 0
@@ -146,19 +148,19 @@ class State:
                         
 
         # Check diagonal
-        
+
         # Check top left to bottom right
         start_row = ROW_COUNT - WINDOW_SIZE
         end_col = COLUMN_COUNT - WINDOW_SIZE
         start_col = 0
-        
+
         while start_col <= end_col:
             count = [0, 0, 0]
             cost = 0
 
             row = start_row
             col = start_col
-        
+
             # Create window
             for i in range(WINDOW_SIZE):
                 count[self.get(row,col)] += 1
@@ -166,9 +168,9 @@ class State:
                 row += 1
                 col += 1
             heuristic += get_score(count, cost)
-        
+
             # slide window
-            while row < ROW_COUNT:
+            while row < ROW_COUNT and col < COLUMN_COUNT:
                 count[self.get(row-WINDOW_SIZE, col-WINDOW_SIZE)] -= 1
                 count[self.get(row,col)] += 1
                 cost -= get_cost(row-WINDOW_SIZE, col-WINDOW_SIZE)
@@ -177,23 +179,23 @@ class State:
 
                 row += 1
                 col += 1
-        
+
             if start_row == 0:
                 start_col += 1
             else:
                 start_row -= 1
-        
+
         # Check top right to bottom left
         start_col -= 1
         end_row = ROW_COUNT - WINDOW_SIZE
-        
+
         while start_row <= end_row:
             count = [0, 0, 0]
             cost = 0
 
             row = start_row
             col = start_col
-        
+
             # Create window
             for i in range(WINDOW_SIZE):
                 count[self.get(row,col)] += 1
@@ -201,9 +203,9 @@ class State:
                 row += 1
                 col -= 1
             heuristic += get_score(count, cost)
-        
+
             # slide window
-            while col >= 0:
+            while col >= 0 and row < ROW_COUNT:
                 count[self.get(row-WINDOW_SIZE, col+WINDOW_SIZE)] -= 1
                 count[self.get(row, col)] += 1
                 cost -= get_cost(row-WINDOW_SIZE, col+WINDOW_SIZE)
@@ -212,7 +214,7 @@ class State:
 
                 row += 1
                 col -= 1
-        
+
             if start_col == COLUMN_COUNT-1:
                 start_row += 1
             else:
@@ -261,41 +263,3 @@ class State:
                 res += 1
         return res
 
-
-# board1 = [
-#         [0, 0, 0, 0, 0, 0, 0],
-#         [0, 0, 0, 0, 0, 0, 0],
-#         [1, 1, 1, 0, 1, 1, 1],
-#         [2, 2, 1, 2, 1, 2, 2],
-#         [2, 1, 2, 2, 2, 1, 1],
-#         [1, 2, 2, 2, 1, 2, 1],
-# ]
-# board2 = [
-#         [0	,0	,0	,0	,0	,1	,1],
-#         [0	,2	,1	,1	,1	,2	,2],
-#         [0	,0	,0	,1	,2	,1	,1],
-#         [0	,1	,0	,1	,1	,2	,2],
-#         [0	,1	,1	,2	,2	,1	,1],
-#         [1	,2	,2	,1	,1	,2	,2],
-# ]
-#
-# myState = State()
-# myState.mapToState(board1,0)
-# trues = 0
-# # for i in range (1,8):
-# #     for j in range (i):
-# #         if myState.move(i-1):
-# #             trues +=1
-#
-# # if myState.move(0):
-# #     trues += 1
-# # if myState.move(3):
-# #     trues += 1
-# myState.move(3)
-# myState.move(3)
-# myState.move(3)
-# pb(myState.value)
-# print()
-# print("Trues: ",trues)
-# myState.showState()
-# print(len("01100000100100000101101000010100000111101000011100000101100000110"))

@@ -13,16 +13,17 @@ def test1():
 
     myState = State()
     myState.mapToState(board1, 0)
-    myState.move(3)
-    myState.move(3)
-    myState.move(3)
-    myState.move(3)
-    myState.move(3)
-    myState.move(3)
-    # myState.move(4)
-    print(myState.getHeuristic())
-
-    print()
-    myState.showState()
+    while(True):
+        i = int(input())
+        myState.move(i)
+        print("H: ",myState.getHeuristic())
+        myState.showState()
 
 test1()
+# //-16-16-18-10-12
+#  = -72
+# -11-12
+
+# //16+13+7
+# +15+9 = 60
+#+14+15+8+9
