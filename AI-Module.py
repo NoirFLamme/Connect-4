@@ -7,29 +7,35 @@ from StateFile import State
 
 def minimax(depth, initial_state, maxplayer:bool):
     if depth == 0:
-        return initial_state.getHeuristic()
+        return initial_state.getHeuristic(),0
     if maxplayer:
         maxEval = -math.inf
-        children = []
+        maxEvalIndex = -1
+        moves = []
         for i in range(7):
             child = copy.deepcopy(initial_state)
             child.move(i)
-            children.append(child)
-        for child in children:
-            eval = minimax(depth - 1, child, False)
-            maxEval = max(maxEval, eval)
-        return maxEval
+            moves.append((child,i))
+        for move in moves:
+            eval = minimax(depth - 1, move[0], False)[0]
+            if (eval > maxEval):
+                maxEval = eval
+                maxEvalIndex = move[1]
+        return maxEval, maxEvalIndex
     else:
         minEval = math.inf
-        children = []
+        minEvalIndex = -1
+        moves = []
         for i in range(7):
             child = copy.deepcopy(initial_state)
             child.move(i)
-            children.append(child)
-        for child in children:
-            eval = minimax(depth - 1, child, True)
-            minEval = min(minEval, eval)
-        return minEval
+            moves.append((child, i))
+        for move in moves:
+            eval = minimax(depth - 1, move[0], True)[0]
+            if (eval < minEval):
+                minEval = eval
+                minEvalIndex = move[1]
+        return minEval, minEvalIndex
 
 
 def minimaxAlphaBeta(depth, InitialState, maxplayer, alpha, beta):
@@ -74,4 +80,5 @@ board1 = [
 myState = State()
 myState.mapToState(board1, 0)
 myState.move(2)
-print(minimax(2,myState,True))
+depth = int(input())
+print(minimax(depth,myState,True))

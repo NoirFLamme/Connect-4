@@ -25,7 +25,7 @@ class State:
         self.value |= requiredBlock << 6 + 9 * colChosen
         # isPoint = self.evaluate(ROW_COUNT-requiredBlock,colChosen)
         self.changeTurn()
-        print("Move Done")
+        # print("Move Done")
         return 0
 
     def getLastColBlock(self,col):
@@ -67,7 +67,7 @@ class State:
         print("It's Player", self.checkTurn()+1,"'s turn")
 
     def get(self,i,j):
-        print("Getting: ",i,j)
+        # print("Getting: ",i,j)
         if i < 0 or j < 0 or i > ROW_COUNT or j > COLUMN_COUNT:
             raise ValueError("Index out of Bound. State.get(",i,",",j,") Failed.")
         thres = self.getLastColBlock(j)
@@ -93,9 +93,7 @@ class State:
             if count[index] == 4:
                 return 100 * playerSign
 
-            x = (22 - (cost + count[0]) + 2**count[index]) * playerSign
-            print("current sliding window added: ",x)
-            return x
+            return (22 - (cost + count[0]) + 2**count[index]) * playerSign
 
 
         def get_cost(row, col):
