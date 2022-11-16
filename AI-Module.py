@@ -54,7 +54,7 @@ def minimaxAlphaBeta(depth, state: State, maxplayer, alpha, beta):
                 child.move(i)
                 moves.append((child, i))
         for move in moves:
-            eval = minimax(depth - 1, move[0], False)[0]
+            eval = minimaxAlphaBeta(depth - 1, move[0], False, alpha, beta)[0]
             if eval > maxEval:
                 maxEval = eval
                 maxEvalIndex = move[1]
@@ -72,7 +72,7 @@ def minimaxAlphaBeta(depth, state: State, maxplayer, alpha, beta):
                 child.move(i)
                 moves.append((child, i))
         for move in moves:
-            eval = minimax(depth - 1, move[0], False)[0]
+            eval = minimaxAlphaBeta(depth - 1, move[0], True, alpha, beta)[0]
             if eval < minEval:
                 minEval = eval
                 minEvalIndex = move[1]
@@ -95,5 +95,5 @@ myState = State()
 myState.mapToState(board1, 0)
 myState.move(3)
 depth = int(input())
-print(minimax(depth,myState,True))
+# print(minimax(depth,myState,True))
 print(minimaxAlphaBeta(depth, myState, True, -math.inf, math.inf))
