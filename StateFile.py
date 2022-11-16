@@ -28,6 +28,9 @@ class State:
         # print("Move Done")
         return 0
 
+    def valid_move(self, i):
+        return self.getLastColBlock(i) != ROW_COUNT
+
     def getLastColBlock(self,col):
         return (self.value & 7 << ROW_COUNT + 9 * col) >> ROW_COUNT + 9 * col
 

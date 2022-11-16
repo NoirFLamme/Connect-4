@@ -5,17 +5,18 @@ import math
 from StateFile import State
 
 
-def minimax(depth, initial_state, maxplayer:bool):
+def minimax(depth, state: State, maxplayer:bool):
     if depth == 0:
-        return initial_state.getHeuristic(),0
+        return state.getHeuristic(),0
     if maxplayer:
         maxEval = -math.inf
         maxEvalIndex = -1
         moves = []
         for i in range(7):
-            child = copy.deepcopy(initial_state)
-            child.move(i)
-            moves.append((child,i))
+            if state.valid_move(i):    
+                child = copy.deepcopy(state)
+                child.move(i)
+                moves.append((child,i))
         for move in moves:
             eval = minimax(depth - 1, move[0], False)[0]
             if (eval > maxEval):
@@ -27,9 +28,10 @@ def minimax(depth, initial_state, maxplayer:bool):
         minEvalIndex = -1
         moves = []
         for i in range(7):
-            child = copy.deepcopy(initial_state)
-            child.move(i)
-            moves.append((child, i))
+            if state.valid_move(i): 
+                child = copy.deepcopy(state)
+                child.move(i)
+                moves.append((child, i))
         for move in moves:
             eval = minimax(depth - 1, move[0], True)[0]
             if (eval < minEval):
@@ -79,6 +81,6 @@ board1 = [
 
 myState = State()
 myState.mapToState(board1, 0)
-myState.move(2)
+myState.move(3)
 depth = int(input())
 print(minimax(depth,myState,True))
