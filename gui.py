@@ -2,8 +2,7 @@ import numpy as np
 import pygame
 import sys
 import math
-from playsound import playsound
-
+from API import getMove
 
 BLUE = (0,139,139)
 BLACK = (0, 0, 0)
@@ -102,7 +101,7 @@ SQUARESIZE = 100
 width = COLUMN_COUNT * SQUARESIZE
 height = (ROW_COUNT + 1) * SQUARESIZE
 
-size = (width, height)
+size = (width, height + 200)
 
 RADIUS = int(SQUARESIZE / 2 - 5)
 
@@ -113,11 +112,13 @@ screen = pygame.display.set_mode(size)
 myfont = pygame.font.SysFont("monospace", 75)
 smallfont = pygame.font.SysFont('Corbel', 35)
 
+
 # rendering a text written in
 # this font
 quit = smallfont.render('quit', True, (255,255,255))
 alphabeta = smallfont.render('alphabeta', True, (255,255,255))
 minmax = smallfont.render('minmax', True, (255,255,255))
+trace = smallfont.render('trace', True, (255,255,255))
 while not game_over:
 
     for event in pygame.event.get():
@@ -128,10 +129,10 @@ while not game_over:
             if display_type != 0:
                 pygame.draw.rect(screen, BLACK, (0, 0, width, SQUARESIZE))
                 posx = event.pos[0]
-                if turn == 0:
+                posy = event.pos[1]
+                if turn == 0 and posy < 700:
                     pygame.draw.circle(screen, RED, (posx, int(SQUARESIZE / 2)), RADIUS)
-                else:
-                    pygame.draw.circle(screen, YELLOW, (posx, int(SQUARESIZE / 2)), RADIUS)
+
                 pygame.display.update()
 
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -140,40 +141,53 @@ while not game_over:
                     pygame.quit()
                 elif width / 2 - 60 <= mouse[0] <= width / 2 + 80 and height / 2 - 50 <= mouse[1] <= height / 2 - 10:
                     display_type = 1
-                    algo = "min"
-                    screen.fill(BLACK)
-                    draw_board(board)
-                    pygame.display.update()
+                    algo = "alpha"
                 elif width / 2 - 60 <= mouse[0] <= width / 2 + 80 and height / 2 - 100 <= mouse[1] <= height / 2 - 60:
                     display_type = 1
-                    algo = "alpha"
-                    screen.fill(BLACK)
-                    draw_board(board)
-                    pygame.display.update()
+                    algo = "min"
+
+                screen.fill(BLACK)
+                draw_board(board)
+
+                # pygame.draw.rect(screen, (100, 100, 100), [width / 2 - 300, 750, 140, 40])
+                # pygame.draw.rect(screen, (100, 100, 100), [width / 2 + 160, 750 , 140, 40])
+                # screen.blit(quit, (width / 2 + 200,750))
+                # screen.blit(trace, (width / 2 - 270, 750))
+                pygame.display.update()
+            elif width / 2 - 300 <= mouse[0] <= width / 2 - 300 + 140 and 750 <= mouse[1] <= 750 + 40:
+                pass
+            elif width / 2 + 160 <= mouse[0] <= width / 2 + 160 + 140 and 750 <= mouse[1] <= 750 + 40:
+                pygame.quit()
             else:
-                playsound("SoundEffects/move.wav")
+                # playsound("SoundEffects/move.wav")
                 pygame.draw.rect(screen, BLACK, (0, 0, width, SQUARESIZE))
                 # print(event.pos)
                 # Ask for Player 1 Input
-                if turn == 0:
-                    posx = event.pos[0]
-                    col = int(math.floor(posx / SQUARESIZE))
+                posy = event.pos[1]
+                if posy < 700:
+                    if turn == 0:
+                        posx = event.pos[0]
+                        col = int(math.floor(posx / SQUARESIZE))
 
-                    if is_valid_location(board, col):
-                        row = get_next_open_row(board, col)
-                        drop_piece(board, row, col, 1)
+                        if is_valid_location(board, col):
+                            row = get_next_open_row(board, col)
+                            drop_piece(board, row, col, 1)
 
-                        if winning_move(board, 1):
-                            label = myfont.render("Player 1 Point!", 1, RED)
-                            screen.blit(label, (40, 10))
-                            playsound("SoundEffects/point.wav")
+                            if winning_move(board, 1):
+                                label = myfont.render("Player 1 Point!", 1, RED)
+                                screen.blit(label, (40, 10))
+                                # playsound("SoundEffects/point.wav")
 
+                    print_board(board)
+                    draw_board(board)
 
+                    turn += 1
+                    turn = turn % 2
 
-                # # Ask for Player 2 Input
-                else:
-                    posx = event.pos[0]
-                    col = int(math.floor(posx / SQUARESIZE))
+                    # # Ask for Player 2 Input
+
+                    # posx = event.pos[0]
+                    col = getMove(board, algo)
 
                     if is_valid_location(board, col):
                         row = get_next_open_row(board, col)
@@ -182,16 +196,17 @@ while not game_over:
                         if winning_move(board, 2):
                             label = myfont.render("Player 2 Point!", 1, YELLOW)
                             screen.blit(label, (40, 10))
-                            playsound("SoundEffects/point.wav")
+                            # playsound("SoundEffects/point.wav")
 
-                print_board(board)
-                draw_board(board)
+                    print_board(board)
+                    draw_board(board)
 
-                turn += 1
-                turn = turn % 2
+                    turn += 1
+                    turn = turn % 2
 
-                if game_over:
-                    pygame.time.wait(3000)
+                    if 0 not in board:
+                        pygame.time.wait(3000)
+                        pygame.quit()
 
         if display_type == 0:
             screen.fill((60, 25, 60))
@@ -227,4 +242,21 @@ while not game_over:
 
 
             # updates the frames of the game
+            pygame.display.update()
+        else:
+            mouse = pygame.mouse.get_pos()
+            if width / 2 - 300 <= mouse[0] <= width / 2 - 300 + 140 and 750 <= mouse[1] <= 750 + 40:
+                pygame.draw.rect(screen, (170,170,170), [width / 2 - 300, 750, 140, 40])
+
+            else:
+                pygame.draw.rect(screen, (100, 100, 100), [width / 2 - 300, 750, 140, 40])
+
+            if width / 2 + 160 <= mouse[0] <= width / 2 + 160 + 140 and 750 <= mouse[1] <= 750 + 40:
+                pygame.draw.rect(screen, (170, 170, 170), [width / 2 + 160, 750, 140, 40])
+
+            else:
+                pygame.draw.rect(screen, (100, 100, 100), [width / 2 + 160, 750, 140, 40])
+
+            screen.blit(quit, (width / 2 + 200, 750))
+            screen.blit(trace, (width / 2 - 270, 750))
             pygame.display.update()
