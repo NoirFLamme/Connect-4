@@ -14,7 +14,7 @@ def minimax(depth, initial_state, maxplayer:bool):
         for i in range(7):
             child = copy.deepcopy(initial_state)
             child.move(i)
-            children.append(child.move(i))
+            children.append(child)
         for child in children:
             eval = minimax(depth - 1, child, False)
             maxEval = max(maxEval, eval)
