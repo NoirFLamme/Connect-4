@@ -4,12 +4,17 @@ import math
 from state import State
 from anytree import Node
 
+def is_leaf(state):
+    for i in range(7):
+        if state.valid_move(i):
+            return False
+    return True
 
 def minimax(depth, state: State, maxplayer: bool):
     rootNode = Node(str(state), parent=None)
     rootNode.best = False
 
-    if depth == 0:
+    if depth == 0 or is_leaf(state):
         heuristic = state.heuristic()
         rootNode.name += f'\nH: {heuristic}'
         return heuristic, 0, rootNode
@@ -28,7 +33,7 @@ def minimax(depth, state: State, maxplayer: bool):
             childNode.parent = rootNode
             if (eval > maxEval):
                 maxEval = eval
-                maxEvalIndex = evalIndex
+                maxEvalIndex = move[1]
                 maxNode = childNode
         maxNode.best = True
         rootNode.name += f'\nH: {maxEval}'
@@ -42,7 +47,7 @@ def minimax(depth, state: State, maxplayer: bool):
             childNode.parent = rootNode
             if (eval < minEval):
                 minEval = eval
-                minEvalIndex = minEvalIndex
+                minEvalIndex = move[1]
                 minNode = childNode
         minNode.best = True
         rootNode.name += f'\nH: {minEval}'
@@ -53,7 +58,7 @@ def minimaxAlphaBeta(depth, state: State, maxplayer, alpha, beta):
     rootNode = Node(str(state), parent=None)
     rootNode.best = False
 
-    if depth == 0:
+    if depth == 0 or is_leaf(state):
         heuristic = state.heuristic()
         rootNode.name += f'\nH: {heuristic}'
         return heuristic, 0, rootNode
@@ -63,6 +68,7 @@ def minimaxAlphaBeta(depth, state: State, maxplayer, alpha, beta):
             child = copy.deepcopy(state)
             child.move(i)
             moves.append((child, i))
+
     if maxplayer:
         maxEval = -math.inf
         maxEvalIndex = -1
@@ -72,7 +78,7 @@ def minimaxAlphaBeta(depth, state: State, maxplayer, alpha, beta):
             childNode.parent = rootNode
             if eval > maxEval:
                 maxEval = eval
-                maxEvalIndex = evalIndex
+                maxEvalIndex = move[1]
                 maxNode = childNode
             alpha = max(alpha, eval)
             if beta < alpha:
@@ -90,7 +96,7 @@ def minimaxAlphaBeta(depth, state: State, maxplayer, alpha, beta):
             childNode.parent = rootNode
             if eval < minEval:
                 minEval = eval
-                minEvalIndex = evalIndex
+                minEvalIndex = move[1]
                 minNode = childNode
             beta = min(beta, eval)
             if beta < alpha:

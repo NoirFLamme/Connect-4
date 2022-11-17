@@ -10,13 +10,10 @@ def evaluation(count, cost):
         return 0
 
     # pieces are either player's or computer's
-    sign = -1 if player > 0 else 1
-    index = PLAYER_PIECE if player > 0 else AGENT_PIECE
-    values = [2, 3, 8, 15]
+    playerSign = -1 if player > 0 else 1
+    index = 1 if player > 0 else 2
 
-    if empty == 0:
-        factor = 1
-    else:
-        factor = empty/cost
+    if count[index] == 4:
+        return 100 * playerSign
 
-    return factor * values[count[index-1]] * sign
+    return (22 - (cost + count[0]) + 2**count[index]) * playerSign

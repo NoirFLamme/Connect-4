@@ -63,8 +63,8 @@ class State:
     def changeTurn(self):
         self.value ^= 1 << 63
 
-    def get(self, i, j):
-        if i < 0 or j < 0 or i >= ROW_COUNT or j >= COLUMN_COUNT:
+    def get(self, i, j):    
+        if i < 0 or j < 0 or i > ROW_COUNT or j > COLUMN_COUNT:
             raise ValueError(
                 "Index out of Bound. State.get(", i, ",", j, ") Failed.")
         thres = self.getLastColBlock(j)
