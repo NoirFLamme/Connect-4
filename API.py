@@ -11,8 +11,7 @@ def parse_np_board(np_board):
         board[[i, len(np_board) - 1 - i]] = board[[len(np_board) - 1 - i, i]]
     return board
 
-def getMove(np_board, algo):
-    depth = 5
+def getMove(np_board, algo, depth=4):
     state = State()
     board = parse_np_board(np_board)
     state.map(board, AGENT_PIECE)

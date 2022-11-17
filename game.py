@@ -125,6 +125,10 @@ minmax = smallfont.render('minmax', True, (255, 255, 255))
 trace = smallfont.render('trace', True, (255, 255, 255))
 scoreP1 = smallfont.render('P1:', True, (255, 255, 255))
 scoreP2 = smallfont.render('P2:', True, (255, 255, 255))
+base_font = pygame.font.Font(None, 32)
+user_text = ''
+active = False
+input_rect = pygame.Rect(310, 200, 140, 32)
 while not game_over:
 
     for event in pygame.event.get():
@@ -133,6 +137,10 @@ while not game_over:
 
         if event.type == pygame.MOUSEMOTION:
             if display_type != 0:
+                if input_rect.collidepoint(event.pos):
+                    active = True
+                else:
+                    active = False
                 pygame.draw.rect(screen, BLACK, (0, 0, width, SQUARESIZE))
                 posx = event.pos[0]
                 posy = event.pos[1]
@@ -184,40 +192,49 @@ while not game_over:
                             #     label = myfont.render("Player 1 Point!", 1, RED)
                             #     screen.blit(label, (40, 10))
                             scoreP = scores(board, turn)[0]
-                            print(f'scoreP: {scoreP}')
-
-                            score = smallfont.render(
-                                str(scoreP), True, (255, 255, 255))
-                            screen.blit(score, (width / 2 + 200 + 30, 820))
-                            pygame.display.update()
+                            scoret = smallfont.render(str(scoreP), True, (255, 255, 255))
+                            pygame.draw.rect(screen, color, [width / 2 - 270+60,820, 70,40])
+                            screen.blit(scoret, (width / 2 - 270 + 85, 820))
+                            pygame.display.flip()
+                            turn += 1
+                            turn = turn % 2
                             # playsound("SoundEffects/point.wav")
 
                     print_board(board)
                     draw_board(board)
 
-                    turn += 1
-                    turn = turn % 2
 
                     # # Ask for Player 2 Input
-
-                    # posx = event.pos[0]
                     col = getMove(board, algo)
+                    # # Ask for Player 2 Input
+                    if turn == 1:
+                        # posx = event.pos[0]
+                        if user_text.isdecimal() != True:
+                            col = getMove(board, algo, 4)
+                        else:
+                            col = getMove(board, algo, int(user_text))
 
-                    if is_valid_location(board, col):
-                        row = get_next_open_row(board, col)
-                        drop_piece(board, row, col, 2)
+                        if is_valid_location(board, col):
+                            row = get_next_open_row(board, col)
+                            drop_piece(board, row, col, 2)
 
-                        # if winning_move(board, 2):
-                        #     label = myfont.render("Player 2 Point!", 1, YELLOW)
-                        #     screen.blit(label, (40, 10))
-                        scoreAI += scores(board, turn)[1]
-                        print(f'scoreAI: {scoreAI}')
+                            # if winning_move(board, 2):
+                            #     label = myfont.render("Player 2 Point!", 1, YELLOW)
+                            #     screen.blit(label, (40, 10))
+                            scoreAI += scores(board, turn)[1]
+                            scorem = smallfont.render(str(scoreAI), True, (255, 255, 255))
+                            pygame.draw.rect(screen, color, [width / 2 + 200+60,820, 70,40])
+                            screen.blit(scorem, (width / 2 + 200+85, 820))
+                            pygame.display.flip()
+                            turn += 1
+                            turn = turn % 2
+                            print(f'scoreAI: {scoreAI}')
 
-                        score = smallfont.render(
-                            str(scoreAI), True, (255, 255, 255))
-                        screen.blit(score, (width / 2 + 200+30, 820))
-                        pygame.display.update()
-                        # playsound("SoundEffects/point.wav")
+                            score = smallfont.render(
+                                str(scoreAI), True, (255, 255, 255))
+                            screen.blit(score, (width / 2 + 200+30, 820))
+                            pygame.display.update()
+                            # playsound("SoundEffects/point.wav")
 
                     print_board(board)
                     draw_board(board)
@@ -228,9 +245,30 @@ while not game_over:
                     if 0 not in board:
                         pygame.time.wait(3000)
                         pygame.quit()
-
+        if event.type == pygame.KEYDOWN:
+            # Check for backspace
+            if event.key == pygame.K_BACKSPACE:
+                # get text input from 0 to -1 i.e. end.
+                user_text = user_text[:-1]
+            else:
+                user_text += event.unicode
         if display_type == 0:
+            if active:
+                color =  (170,170,170)
+            else:
+                color = (100,100,100)
             screen.fill((60, 25, 60))
+
+            pygame.draw.rect(screen, color, input_rect)
+
+            text_surface = base_font.render(user_text, True, (255, 255, 255))
+
+            # render at position stated in arguments
+            screen.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
+
+            # set width of textfield so that text cannot get
+            # outside of user's text input
+            input_rect.w = max(100, text_surface.get_width() + 10)
 
             # stores the (x,y) coordinates into
             # the variable as a tuple
