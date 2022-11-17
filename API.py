@@ -14,11 +14,11 @@ def parse_np_board(np_board):
 def getMove(np_board, algo, depth=4):
     state = State()
     board = parse_np_board(np_board)
-    state.map(board, AGENT_PIECE)
+    state.map(board, 1)
     if algo == "min":
-        return minimax(depth, state, True)[1]
+        return minimax(depth, state, True)
     else:
-        return minimaxAlphaBeta(depth, state, True, -math.inf, math.inf)[1]
+        return minimaxAlphaBeta(depth, state, True, -math.inf, math.inf)
 
 
 def scores(np_board, turn):

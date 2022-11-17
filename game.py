@@ -3,7 +3,7 @@ import pygame
 import sys
 import math
 from API import getMove, scores
-from trace import viewTree
+from trace import save_tree
 
 BLUE = (0, 139, 139)
 BLACK = (0, 0, 0)
@@ -129,6 +129,7 @@ base_font = pygame.font.Font(None, 32)
 user_text = ''
 active = False
 input_rect = pygame.Rect(310, 200, 140, 32)
+node = None
 while not game_over:
 
     for event in pygame.event.get():
@@ -169,7 +170,8 @@ while not game_over:
                 # screen.blit(trace, (width / 2 - 270, 750))
                 pygame.display.update()
             elif width / 2 - 300 <= mouse[0] <= width / 2 - 300 + 140 and 750 <= mouse[1] <= 750 + 40:
-                viewTree(board)
+                if node:
+                    save_tree(node)
             elif width / 2 + 160 <= mouse[0] <= width / 2 + 160 + 140 and 750 <= mouse[1] <= 750 + 40:
                 pygame.quit()
             else:
@@ -207,9 +209,9 @@ while not game_over:
                     if turn == 1:
                         # posx = event.pos[0]
                         if user_text.isdecimal() != True:
-                            col = getMove(board, algo, 4)
+                            heuristic, col, node = getMove(board, algo)
                         else:
-                            col = getMove(board, algo, int(user_text))
+                            heuristic, col, node = getMove(board, algo, int(user_text))
 
                         if is_valid_location(board, col):
                             row = get_next_open_row(board, col)

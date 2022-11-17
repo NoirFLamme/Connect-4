@@ -2,11 +2,17 @@ import copy
 import math
 
 from state import State
+from anytree import Node
 
 
 def minimax(depth, state: State, maxplayer: bool):
+    rootNode = Node(str(state), parent=None)
+    rootNode.best = False
+
     if depth == 0:
-        return state.heuristic(), 0
+        heuristic = state.heuristic()
+        rootNode.name += f'\nH: {heuristic}'
+        return heuristic, 0, rootNode
     moves = []
     for i in range(7):
         if state.valid_move(i):
@@ -16,29 +22,41 @@ def minimax(depth, state: State, maxplayer: bool):
     if maxplayer:
         maxEval = -math.inf
         maxEvalIndex = -1
+        maxNode = None
         for move in moves:
-            eval = minimax(depth - 1, move[0], False)[0]
-            # if depth == 5:
-            #     print(eval)
-            #     print(move[0].showState())
+            eval, evalIndex, childNode = minimax(depth - 1, move[0], False)
+            childNode.parent = rootNode
             if (eval > maxEval):
                 maxEval = eval
-                maxEvalIndex = move[1]
-        return maxEval, maxEvalIndex
+                maxEvalIndex = evalIndex
+                maxNode = childNode
+        maxNode.best = True
+        rootNode.name += f'\nH: {maxEval}'
+        return maxEval, maxEvalIndex, rootNode
     else:
         minEval = math.inf
         minEvalIndex = -1
+        minNode = None
         for move in moves:
-            eval = minimax(depth - 1, move[0], True)[0]
+            eval, evalIndex, childNode = minimax(depth - 1, move[0], True)
+            childNode.parent = rootNode
             if (eval < minEval):
                 minEval = eval
-                minEvalIndex = move[1]
-        return minEval, minEvalIndex
+                minEvalIndex = minEvalIndex
+                minNode = childNode
+        minNode.best = True
+        rootNode.name += f'\nH: {minEval}'
+        return minEval, minEvalIndex, rootNode
 
 
 def minimaxAlphaBeta(depth, state: State, maxplayer, alpha, beta):
+    rootNode = Node(str(state), parent=None)
+    rootNode.best = False
+
     if depth == 0:
-        return state.heuristic(), 0
+        heuristic = state.heuristic()
+        rootNode.name += f'\nH: {heuristic}'
+        return heuristic, 0, rootNode
     moves = []
     for i in range(7):
         if state.valid_move(i):
@@ -48,24 +66,36 @@ def minimaxAlphaBeta(depth, state: State, maxplayer, alpha, beta):
     if maxplayer:
         maxEval = -math.inf
         maxEvalIndex = -1
+        maxNode = None
         for move in moves:
-            eval = minimaxAlphaBeta(depth - 1, move[0], False, alpha, beta)[0]
+            eval, evalIndex, childNode = minimaxAlphaBeta(depth - 1, move[0], False, alpha, beta)
+            childNode.parent = rootNode
             if eval > maxEval:
                 maxEval = eval
-                maxEvalIndex = move[1]
+                maxEvalIndex = evalIndex
+                maxNode = childNode
             alpha = max(alpha, eval)
             if beta < alpha:
-                return maxEval, maxEvalIndex
-        return maxEval,  maxEvalIndex
+                rootNode.name += f'\nH: {maxEval}'
+                return maxEval, maxEvalIndex, maxNode
+        maxNode.best = True
+        rootNode.name += f'\nH: {maxEval}'
+        return maxEval,  maxEvalIndex, maxNode
     else:
         minEval = math.inf
         minEvalIndex = -1
+        minNode = None
         for move in moves:
-            eval = minimaxAlphaBeta(depth - 1, move[0], True, alpha, beta)[0]
+            eval, evalIndex, childNode = minimaxAlphaBeta(depth - 1, move[0], True, alpha, beta)
+            childNode.parent = rootNode
             if eval < minEval:
                 minEval = eval
-                minEvalIndex = move[1]
+                minEvalIndex = evalIndex
+                minNode = childNode
             beta = min(beta, eval)
             if beta < alpha:
-                return minEval, minEvalIndex
-        return minEval, minEvalIndex
+                rootNode.name += f'\nH: {minEval}'
+                return minEval, minEvalIndex, minNode
+        minNode.best = True
+        rootNode.name += f'\nH: {minEval}'
+        return minEval, minEvalIndex, minNode

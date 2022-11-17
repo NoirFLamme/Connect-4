@@ -7,14 +7,16 @@ class State:
         self.value = 0
 
     def __str__(self):
+        value = ""
         board = [[0 for i in range(COLUMN_COUNT)] for j in range(ROW_COUNT)]
         for j in range(COLUMN_COUNT):
             for i in range(ROW_COUNT):
                 board[i][j] = self.get(i, j)
-        str = '\t'.join(map(str, i))
-        str += '\n'
-        str += f'\n It\'s Player, {self.checkTurn()+1},\'s turn'
-        return str
+        for i in board:
+            value += '\t'.join(map(str, i))
+            value += '\n'
+        return value
+
 
     def map(self, board, turn):
         self.value = 0
