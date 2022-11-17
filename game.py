@@ -137,21 +137,20 @@ while not game_over:
 
         if event.type == pygame.MOUSEMOTION:
             if display_type != 0:
-                if input_rect.collidepoint(event.pos):
-                    active = True
-                else:
-                    active = False
                 pygame.draw.rect(screen, BLACK, (0, 0, width, SQUARESIZE))
                 posx = event.pos[0]
                 posy = event.pos[1]
                 if turn == 0 and posy < 700:
-                    pygame.draw.circle(
-                        screen, RED, (posx, int(SQUARESIZE / 2)), RADIUS)
+                    pygame.draw.circle(screen, RED, (posx, int(SQUARESIZE / 2)), RADIUS)
 
                 pygame.display.update()
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if display_type == 0:
+                if input_rect.collidepoint(event.pos):
+                    active = True
+                else:
+                    active = False
                 if width / 2 <= mouse[0] <= width / 2 + 140 and height / 2 <= mouse[1] <= height / 2 + 40:
                     pygame.quit()
                 elif width / 2 - 60 <= mouse[0] <= width / 2 + 80 and height / 2 - 50 <= mouse[1] <= height / 2 - 10:
@@ -205,8 +204,6 @@ while not game_over:
 
 
                     # # Ask for Player 2 Input
-                    col = getMove(board, algo)
-                    # # Ask for Player 2 Input
                     if turn == 1:
                         # posx = event.pos[0]
                         if user_text.isdecimal() != True:
@@ -221,26 +218,20 @@ while not game_over:
                             # if winning_move(board, 2):
                             #     label = myfont.render("Player 2 Point!", 1, YELLOW)
                             #     screen.blit(label, (40, 10))
-                            scoreAI += scores(board, turn)[1]
+                            scoreAI = scores(board, turn)[1]
                             scorem = smallfont.render(str(scoreAI), True, (255, 255, 255))
                             pygame.draw.rect(screen, color, [width / 2 + 200+60,820, 70,40])
                             screen.blit(scorem, (width / 2 + 200+85, 820))
                             pygame.display.flip()
                             turn += 1
                             turn = turn % 2
-                            print(f'scoreAI: {scoreAI}')
-
-                            score = smallfont.render(
-                                str(scoreAI), True, (255, 255, 255))
-                            screen.blit(score, (width / 2 + 200+30, 820))
-                            pygame.display.update()
                             # playsound("SoundEffects/point.wav")
 
                     print_board(board)
                     draw_board(board)
 
-                    turn += 1
-                    turn = turn % 2
+                    # turn += 1
+                    # turn = turn % 2
 
                     if 0 not in board:
                         pygame.time.wait(3000)
