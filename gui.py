@@ -2,7 +2,8 @@ import numpy as np
 import pygame
 import sys
 import math
-from API import getMove
+from API import getMove, getScore
+from Trace import viewTree
 
 BLUE = (0,139,139)
 BLACK = (0, 0, 0)
@@ -90,6 +91,8 @@ game_over = False
 turn = 0
 display_type = 0
 algo = "def"
+scoreAI = 0
+scoreP = 0
 
 # initalize pygame
 pygame.init()
@@ -119,6 +122,8 @@ quit = smallfont.render('quit', True, (255,255,255))
 alphabeta = smallfont.render('alphabeta', True, (255,255,255))
 minmax = smallfont.render('minmax', True, (255,255,255))
 trace = smallfont.render('trace', True, (255,255,255))
+scoreP1 = smallfont.render('P1:', True, (255,255,255))
+scoreP2 = smallfont.render('P2:', True, (255,255,255))
 while not game_over:
 
     for event in pygame.event.get():
@@ -155,7 +160,7 @@ while not game_over:
                 # screen.blit(trace, (width / 2 - 270, 750))
                 pygame.display.update()
             elif width / 2 - 300 <= mouse[0] <= width / 2 - 300 + 140 and 750 <= mouse[1] <= 750 + 40:
-                pass
+                viewTree(board)
             elif width / 2 + 160 <= mouse[0] <= width / 2 + 160 + 140 and 750 <= mouse[1] <= 750 + 40:
                 pygame.quit()
             else:
@@ -173,9 +178,13 @@ while not game_over:
                             row = get_next_open_row(board, col)
                             drop_piece(board, row, col, 1)
 
-                            if winning_move(board, 1):
-                                label = myfont.render("Player 1 Point!", 1, RED)
-                                screen.blit(label, (40, 10))
+                            # if winning_move(board, 1):
+                            #     label = myfont.render("Player 1 Point!", 1, RED)
+                            #     screen.blit(label, (40, 10))
+                            scoreP += getScore(board, turn, row, col)
+                            score = smallfont.render(str(scoreP), True, (255, 255, 255))
+                            screen.blit(score, (width / 2 + 200 + 30, 820))
+                            pygame.display.update()
                                 # playsound("SoundEffects/point.wav")
 
                     print_board(board)
@@ -189,13 +198,18 @@ while not game_over:
                     # posx = event.pos[0]
                     col = getMove(board, algo)
 
+
                     if is_valid_location(board, col):
                         row = get_next_open_row(board, col)
                         drop_piece(board, row, col, 2)
 
-                        if winning_move(board, 2):
-                            label = myfont.render("Player 2 Point!", 1, YELLOW)
-                            screen.blit(label, (40, 10))
+                        # if winning_move(board, 2):
+                        #     label = myfont.render("Player 2 Point!", 1, YELLOW)
+                        #     screen.blit(label, (40, 10))
+                        scoreAI += getScore(board, turn, row, col)
+                        score = smallfont.render(str(scoreAI), True, (255, 255, 255))
+                        screen.blit(score, (width / 2 + 200+30, 820))
+                        pygame.display.update()
                             # playsound("SoundEffects/point.wav")
 
                     print_board(board)
@@ -259,4 +273,6 @@ while not game_over:
 
             screen.blit(quit, (width / 2 + 200, 750))
             screen.blit(trace, (width / 2 - 270, 750))
+            screen.blit(scoreP1, (width / 2 - 270, 820))
+            screen.blit(scoreP2, (width / 2 + 200, 820))
             pygame.display.update()
