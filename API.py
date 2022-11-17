@@ -1,29 +1,29 @@
 import copy
 import math
 
-import numpy as np
+from state import State
+from search import minimax, minimaxAlphaBeta
+from const import *
 
-from StateFile import State
-from AIModule import  minimax,minimaxAlphaBeta
+def parse_np_board(np_board):
+    board = copy.deepcopy(np_board)
+    for i in range(int(len(np_board) / 2)):
+        board[[i, len(np_board) - 1 - i]] = board[[len(np_board) - 1 - i, i]]
+    return board
 
-
-def getMove(board, algo):
-    ourboard = copy.deepcopy(board)
-    for i in range(int(len(board) / 2)):
-        ourboard[[i, len(board) - 1 - i]] = ourboard[[len(board) - 1 - i, i]]
+def getMove(np_board, algo):
+    depth = 5
     state = State()
-    state.mapToState(ourboard, 1)
+    board = parse_np_board(np_board)
+    state.map(board, AGENT_PIECE)
     if algo == "min":
-        return minimax(3, state, True)[1]
+        return minimax(depth, state, True)[1]
     else:
-        # print(minimaxAlphaBeta(5, state, True, -math.inf, math.inf)[1])
-        return minimaxAlphaBeta(5, state, True, -math.inf, math.inf)[1]
+        return minimaxAlphaBeta(depth, state, True, -math.inf, math.inf)[1]
 
-def getScore(board, turn, row, col):
-    ourboard = copy.deepcopy(board)
-    for i in range(int(len(board) / 2)):
-        ourboard[[i, len(board) - 1 - i]] = ourboard[[len(board) - 1 - i, i]]
+
+def scores(np_board, turn):
     state = State()
-    state.mapToState(ourboard, turn)
-    score = state.evaluate(row, col)
-    return score
+    board = parse_np_board(np_board)
+    state.map(board, turn)
+    return state.scores()

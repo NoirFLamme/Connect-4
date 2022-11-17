@@ -2,10 +2,10 @@ import numpy as np
 import pygame
 import sys
 import math
-from API import getMove, getScore
-from Trace import viewTree
+from API import getMove, scores
+from trace import viewTree
 
-BLUE = (0,139,139)
+BLUE = (0, 139, 139)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
@@ -42,46 +42,47 @@ def winning_move(board, piece):
     for c in range(COLUMN_COUNT - 3):
         for r in range(ROW_COUNT):
             if board[r][c] == piece and board[r][c + 1] == piece and board[r][c + 2] == piece and board[r][
-                c + 3] == piece:
+                    c + 3] == piece:
                 return True
 
     # Check vertical locations for win
     for c in range(COLUMN_COUNT):
         for r in range(ROW_COUNT - 3):
             if board[r][c] == piece and board[r + 1][c] == piece and board[r + 2][c] == piece and board[r + 3][
-                c] == piece:
+                    c] == piece:
                 return True
 
     # Check positively sloped diaganols
     for c in range(COLUMN_COUNT - 3):
         for r in range(ROW_COUNT - 3):
             if board[r][c] == piece and board[r + 1][c + 1] == piece and board[r + 2][c + 2] == piece and board[r + 3][
-                c + 3] == piece:
+                    c + 3] == piece:
                 return True
 
     # Check negatively sloped diaganols
     for c in range(COLUMN_COUNT - 3):
         for r in range(3, ROW_COUNT):
             if board[r][c] == piece and board[r - 1][c + 1] == piece and board[r - 2][c + 2] == piece and board[r - 3][
-                c + 3] == piece:
+                    c + 3] == piece:
                 return True
 
 
 def draw_board(board):
     for c in range(COLUMN_COUNT):
         for r in range(ROW_COUNT):
-            pygame.draw.rect(screen, BLUE, (c * SQUARESIZE, r * SQUARESIZE + SQUARESIZE, SQUARESIZE, SQUARESIZE))
+            pygame.draw.rect(screen, BLUE, (c * SQUARESIZE, r *
+                             SQUARESIZE + SQUARESIZE, SQUARESIZE, SQUARESIZE))
             pygame.draw.circle(screen, BLACK, (
-            int(c * SQUARESIZE + SQUARESIZE / 2), int(r * SQUARESIZE + SQUARESIZE + SQUARESIZE / 2)), RADIUS)
+                int(c * SQUARESIZE + SQUARESIZE / 2), int(r * SQUARESIZE + SQUARESIZE + SQUARESIZE / 2)), RADIUS)
 
     for c in range(COLUMN_COUNT):
         for r in range(ROW_COUNT):
             if board[r][c] == 1:
                 pygame.draw.circle(screen, RED, (
-                int(c * SQUARESIZE + SQUARESIZE / 2), height - int(r * SQUARESIZE + SQUARESIZE / 2)), RADIUS)
+                    int(c * SQUARESIZE + SQUARESIZE / 2), height - int(r * SQUARESIZE + SQUARESIZE / 2)), RADIUS)
             elif board[r][c] == 2:
                 pygame.draw.circle(screen, YELLOW, (
-                int(c * SQUARESIZE + SQUARESIZE / 2), height - int(r * SQUARESIZE + SQUARESIZE / 2)), RADIUS)
+                    int(c * SQUARESIZE + SQUARESIZE / 2), height - int(r * SQUARESIZE + SQUARESIZE / 2)), RADIUS)
     pygame.display.update()
 
 
@@ -118,12 +119,12 @@ smallfont = pygame.font.SysFont('Corbel', 35)
 
 # rendering a text written in
 # this font
-quit = smallfont.render('quit', True, (255,255,255))
-alphabeta = smallfont.render('alphabeta', True, (255,255,255))
-minmax = smallfont.render('minmax', True, (255,255,255))
-trace = smallfont.render('trace', True, (255,255,255))
-scoreP1 = smallfont.render('P1:', True, (255,255,255))
-scoreP2 = smallfont.render('P2:', True, (255,255,255))
+quit = smallfont.render('quit', True, (255, 255, 255))
+alphabeta = smallfont.render('alphabeta', True, (255, 255, 255))
+minmax = smallfont.render('minmax', True, (255, 255, 255))
+trace = smallfont.render('trace', True, (255, 255, 255))
+scoreP1 = smallfont.render('P1:', True, (255, 255, 255))
+scoreP2 = smallfont.render('P2:', True, (255, 255, 255))
 while not game_over:
 
     for event in pygame.event.get():
@@ -136,7 +137,8 @@ while not game_over:
                 posx = event.pos[0]
                 posy = event.pos[1]
                 if turn == 0 and posy < 700:
-                    pygame.draw.circle(screen, RED, (posx, int(SQUARESIZE / 2)), RADIUS)
+                    pygame.draw.circle(
+                        screen, RED, (posx, int(SQUARESIZE / 2)), RADIUS)
 
                 pygame.display.update()
 
@@ -181,11 +183,14 @@ while not game_over:
                             # if winning_move(board, 1):
                             #     label = myfont.render("Player 1 Point!", 1, RED)
                             #     screen.blit(label, (40, 10))
-                            scoreP += getScore(board, turn, row, col)
-                            score = smallfont.render(str(scoreP), True, (255, 255, 255))
+                            scoreP = scores(board, turn)[0]
+                            print(f'scoreP: {scoreP}')
+
+                            score = smallfont.render(
+                                str(scoreP), True, (255, 255, 255))
                             screen.blit(score, (width / 2 + 200 + 30, 820))
                             pygame.display.update()
-                                # playsound("SoundEffects/point.wav")
+                            # playsound("SoundEffects/point.wav")
 
                     print_board(board)
                     draw_board(board)
@@ -198,7 +203,6 @@ while not game_over:
                     # posx = event.pos[0]
                     col = getMove(board, algo)
 
-
                     if is_valid_location(board, col):
                         row = get_next_open_row(board, col)
                         drop_piece(board, row, col, 2)
@@ -206,11 +210,14 @@ while not game_over:
                         # if winning_move(board, 2):
                         #     label = myfont.render("Player 2 Point!", 1, YELLOW)
                         #     screen.blit(label, (40, 10))
-                        scoreAI += getScore(board, turn, row, col)
-                        score = smallfont.render(str(scoreAI), True, (255, 255, 255))
+                        scoreAI += scores(board, turn)[1]
+                        print(f'scoreAI: {scoreAI}')
+
+                        score = smallfont.render(
+                            str(scoreAI), True, (255, 255, 255))
                         screen.blit(score, (width / 2 + 200+30, 820))
                         pygame.display.update()
-                            # playsound("SoundEffects/point.wav")
+                        # playsound("SoundEffects/point.wav")
 
                     print_board(board)
                     draw_board(board)
@@ -232,44 +239,53 @@ while not game_over:
             # if mouse is hovered on a button it
             # changes to lighter shade
             if width / 2 - 60 <= mouse[0] <= width / 2 + 80 and height / 2 <= mouse[1] <= height / 2 + 40:
-                pygame.draw.rect(screen, (170,170,170), [width / 2 - 60, height / 2, 140, 40])
+                pygame.draw.rect(screen, (170, 170, 170), [
+                                 width / 2 - 60, height / 2, 140, 40])
 
             else:
-                pygame.draw.rect(screen, (100,100,100), [width / 2 - 60, height / 2, 140, 40])
+                pygame.draw.rect(screen, (100, 100, 100), [
+                                 width / 2 - 60, height / 2, 140, 40])
 
             if width / 2 - 60 <= mouse[0] <= width / 2 + 80 and height / 2 - 50 <= mouse[1] <= height / 2 - 10:
-                pygame.draw.rect(screen, (170, 170, 170), [width / 2 - 60, height / 2 - 50 , 140, 40])
+                pygame.draw.rect(screen, (170, 170, 170), [
+                                 width / 2 - 60, height / 2 - 50, 140, 40])
 
             else:
-                pygame.draw.rect(screen, (100, 100, 100), [width / 2 - 60, height / 2 - 50 , 140, 40])
+                pygame.draw.rect(screen, (100, 100, 100), [
+                                 width / 2 - 60, height / 2 - 50, 140, 40])
 
             if width / 2 - 60 <= mouse[0] <= width / 2 + 80 and height / 2 - 100 <= mouse[1] <= height / 2 - 60:
-                pygame.draw.rect(screen, (170, 170, 170), [width / 2 - 60, height / 2 - 100 , 140, 40])
+                pygame.draw.rect(screen, (170, 170, 170), [
+                                 width / 2 - 60, height / 2 - 100, 140, 40])
 
             else:
-                pygame.draw.rect(screen, (100, 100, 100), [width / 2 - 60, height / 2 - 100, 140, 40])
+                pygame.draw.rect(screen, (100, 100, 100), [
+                                 width / 2 - 60, height / 2 - 100, 140, 40])
 
             # superimposing the text onto our button
             screen.blit(quit, (width / 2 + 50 - 70, height / 2))
             screen.blit(minmax, (width / 2 + 50 - 95, height / 2 - 100))
             screen.blit(alphabeta, (width / 2 + 50 - 110,  height / 2 - 50))
 
-
             # updates the frames of the game
             pygame.display.update()
         else:
             mouse = pygame.mouse.get_pos()
             if width / 2 - 300 <= mouse[0] <= width / 2 - 300 + 140 and 750 <= mouse[1] <= 750 + 40:
-                pygame.draw.rect(screen, (170,170,170), [width / 2 - 300, 750, 140, 40])
+                pygame.draw.rect(screen, (170, 170, 170), [
+                                 width / 2 - 300, 750, 140, 40])
 
             else:
-                pygame.draw.rect(screen, (100, 100, 100), [width / 2 - 300, 750, 140, 40])
+                pygame.draw.rect(screen, (100, 100, 100), [
+                                 width / 2 - 300, 750, 140, 40])
 
             if width / 2 + 160 <= mouse[0] <= width / 2 + 160 + 140 and 750 <= mouse[1] <= 750 + 40:
-                pygame.draw.rect(screen, (170, 170, 170), [width / 2 + 160, 750, 140, 40])
+                pygame.draw.rect(screen, (170, 170, 170), [
+                                 width / 2 + 160, 750, 140, 40])
 
             else:
-                pygame.draw.rect(screen, (100, 100, 100), [width / 2 + 160, 750, 140, 40])
+                pygame.draw.rect(screen, (100, 100, 100), [
+                                 width / 2 + 160, 750, 140, 40])
 
             screen.blit(quit, (width / 2 + 200, 750))
             screen.blit(trace, (width / 2 - 270, 750))

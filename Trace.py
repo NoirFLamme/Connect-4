@@ -1,21 +1,18 @@
 import os
-
 import copy
+
 from anytree import Node, RenderTree
 from anytree.exporter import DotExporter, UniqueDotExporter
-
-from StateFile import State
+from state import State
 
 
 def viewTree(board):
     ourboard = copy.deepcopy(board)
     for i in range(int(len(board) / 2)):
         ourboard[[i, len(board) - 1 - i]] = ourboard[[len(board) - 1 - i, i]]
-    parent = Node(board,parent=None)
+    parent = Node(board, parent=None)
     state = State()
-    state.mapToState(ourboard, 1)
-
-
+    state.map(ourboard, 1)
 
     for i in range(7):
         if state.valid_move(i):
@@ -36,7 +33,8 @@ def viewTree(board):
                     if state.valid_move(x):
                         child4 = copy.deepcopy(child3)
                         child4.move(x)
-                        childNode3 = Node(child4.showState(), parent=childNode2)
+                        childNode3 = Node(child4.showState(),
+                                          parent=childNode2)
     UniqueDotExporter(parent).to_picture("udo.pdf")
     path = 'udo.pdf'
     os.system(path)
