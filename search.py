@@ -4,11 +4,13 @@ import math
 from state import State
 from anytree import Node
 
+
 def is_leaf(state):
     for i in range(7):
         if state.valid_move(i):
             return False
     return True
+
 
 def minimax(depth, state: State, maxplayer: bool):
     rootNode = Node(str(state), parent=None)
@@ -24,6 +26,7 @@ def minimax(depth, state: State, maxplayer: bool):
             child = copy.deepcopy(state)
             child.move(i)
             moves.append((child, i))
+
     if maxplayer:
         maxEval = -math.inf
         maxEvalIndex = -1
@@ -31,7 +34,7 @@ def minimax(depth, state: State, maxplayer: bool):
         for move in moves:
             eval, evalIndex, childNode = minimax(depth - 1, move[0], False)
             childNode.parent = rootNode
-            if (eval > maxEval):
+            if eval > maxEval:
                 maxEval = eval
                 maxEvalIndex = move[1]
                 maxNode = childNode
@@ -45,7 +48,7 @@ def minimax(depth, state: State, maxplayer: bool):
         for move in moves:
             eval, evalIndex, childNode = minimax(depth - 1, move[0], True)
             childNode.parent = rootNode
-            if (eval < minEval):
+            if eval < minEval:
                 minEval = eval
                 minEvalIndex = move[1]
                 minNode = childNode
@@ -74,7 +77,8 @@ def minimaxAlphaBeta(depth, state: State, maxplayer, alpha, beta):
         maxEvalIndex = -1
         maxNode = None
         for move in moves:
-            eval, evalIndex, childNode = minimaxAlphaBeta(depth - 1, move[0], False, alpha, beta)
+            eval, evalIndex, childNode = minimaxAlphaBeta(
+                depth - 1, move[0], False, alpha, beta)
             childNode.parent = rootNode
             if eval > maxEval:
                 maxEval = eval
@@ -82,17 +86,17 @@ def minimaxAlphaBeta(depth, state: State, maxplayer, alpha, beta):
                 maxNode = childNode
             alpha = max(alpha, eval)
             if beta < alpha:
-                rootNode.name += f'\nH: {maxEval}'
-                return maxEval, maxEvalIndex, maxNode
+                break
         maxNode.best = True
         rootNode.name += f'\nH: {maxEval}'
-        return maxEval,  maxEvalIndex, maxNode
+        return maxEval, maxEvalIndex, rootNode
     else:
         minEval = math.inf
         minEvalIndex = -1
         minNode = None
         for move in moves:
-            eval, evalIndex, childNode = minimaxAlphaBeta(depth - 1, move[0], True, alpha, beta)
+            eval, evalIndex, childNode = minimaxAlphaBeta(
+                depth - 1, move[0], True, alpha, beta)
             childNode.parent = rootNode
             if eval < minEval:
                 minEval = eval
@@ -100,8 +104,7 @@ def minimaxAlphaBeta(depth, state: State, maxplayer, alpha, beta):
                 minNode = childNode
             beta = min(beta, eval)
             if beta < alpha:
-                rootNode.name += f'\nH: {minEval}'
-                return minEval, minEvalIndex, minNode
+                break
         minNode.best = True
         rootNode.name += f'\nH: {minEval}'
-        return minEval, minEvalIndex, minNode
+        return minEval, minEvalIndex, rootNode

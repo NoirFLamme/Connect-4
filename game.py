@@ -3,7 +3,7 @@ import pygame
 import sys
 import math
 from API import getMove, scores
-from Trace import save_tree
+from trace import save_tree
 from itertools import chain
 
 
